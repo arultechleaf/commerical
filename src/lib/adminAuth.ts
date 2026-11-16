@@ -30,9 +30,15 @@ async function readAdmin(): Promise<AdminRecord | null> {
     if (!email || !password) return null;
     const salt = randomBytes(16).toString("hex");
     const record: AdminRecord = { email, salt, hash: hashPassword(password, salt), secret: randomBytes(32).toString("hex") };
-    await fs.mkdir(storageDir, { recursive: true });
-    await fs.writeFile(adminFile, JSON.stringify(record, null, 2), "utf8");
-    return record;
+    try {
+      await fs.mkdir(storageDir, { recursive: true });
+      await fs.writeFile(adminFile, JSON.stringify(record, null, 2), "utf8");
+      return record;
+    } catch {
+      // Read-only hosting: derive the login from the environment on every request instead.
+      const fixedSalt = createHmac("sha256", "mithu-salt").update(email).digest("hex").slice(0, 32);
+      return { email, salt: fixedSalt, hash: hashPassword(password, fixedSalt), secret: createHmac("sha256", "mithu-secret").update(email + password).digest("hex") };
+    }
   }
 }
 

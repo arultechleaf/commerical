@@ -13,16 +13,24 @@ async function readAll(): Promise<Product[]> {
     return JSON.parse(await fs.readFile(productsFile, "utf8")) as Product[];
   } catch {
     // First run: start from the sample catalogue so the shop is never empty.
-    await writeAll(seedProducts);
+    // On read-only hosting (e.g. Vercel) saving fails, so just serve the samples.
+    try { await writeAll(seedProducts); } catch {}
     return seedProducts;
   }
 }
 
+export const readOnlyMessage =
+  "This hosting has a read-only disk, so changes can't be saved here. Run the site on a server with a writable disk (own PC or VPS), or connect a database.";
+
 async function writeAll(products: Product[]) {
-  await fs.mkdir(storageDir, { recursive: true });
-  const tmp = `${productsFile}.tmp`;
-  await fs.writeFile(tmp, JSON.stringify(products, null, 2), "utf8");
-  await fs.rename(tmp, productsFile);
+  try {
+    await fs.mkdir(storageDir, { recursive: true });
+    const tmp = `${productsFile}.tmp`;
+    await fs.writeFile(tmp, JSON.stringify(products, null, 2), "utf8");
+    await fs.rename(tmp, productsFile);
+  } catch {
+    throw new Error(readOnlyMessage);
+  }
 }
 
 export async function getProducts() {
@@ -68,8 +76,12 @@ export async function saveUpload(file: File) {
   const data = Buffer.from(await file.arrayBuffer());
   if (ext === ".svg" && !/<svg[\s>]/i.test(data.toString("utf8", 0, 4096))) throw new Error("That file is not a valid SVG image.");
   const name = `${crypto.randomUUID()}${ext}`;
-  await fs.mkdir(uploadsDir, { recursive: true });
-  await fs.writeFile(path.join(uploadsDir, name), data);
+  try {
+    await fs.mkdir(uploadsDir, { recursive: true });
+    await fs.writeFile(path.join(uploadsDir, name), data);
+  } catch {
+    throw new Error(readOnlyMessage);
+  }
   return `/uploads/${name}`;
 }
 

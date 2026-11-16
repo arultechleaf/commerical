@@ -51,6 +51,7 @@ export async function saveProductAction(formData: FormData) {
   if (!image) return fail("Please upload an image or paste an image link.");
   if (existing && existing.image !== image) await removeUpload(existing.image);
 
+  try {
   await saveProduct({
     id,
     name,
@@ -63,13 +64,21 @@ export async function saveProductAction(formData: FormData) {
     featured: formData.get("featured") === "on",
     newArrival: formData.get("newArrival") === "on",
   });
+  } catch (error) {
+    return fail(error instanceof Error ? error.message : "Could not save the product.");
+  }
   revalidatePath("/", "layout");
   redirect("/admin?saved=1");
 }
 
 export async function deleteProductAction(formData: FormData) {
   if (!(await isAdmin())) redirect("/admin/login");
-  const removed = await deleteProduct(String(formData.get("id") ?? ""));
+  let removed;
+  try {
+    removed = await deleteProduct(String(formData.get("id") ?? ""));
+  } catch (error) {
+    redirect(`/admin?error=${encodeURIComponent(error instanceof Error ? error.message : "Could not delete the product.")}`);
+  }
   if (removed) await removeUpload(removed.image);
   revalidatePath("/", "layout");
   redirect("/admin?deleted=1");
