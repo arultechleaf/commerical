@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mihu Cute Corner
 
-## Getting Started
+A static-catalog Next.js storefront for jewellery, chains, bangles, earrings and hair accessories.
 
-First, run the development server:
+## Run locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env.local` and add your EmailJS service ID, template ID and public key.
+3. Start the development server with `npm run dev`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The enquiry form uses EmailJS in the browser. Configure an EmailJS template with `from_name`, `from_email`, `phone`, `subject`, `message` and `reply_to` parameters. Without those three environment values, the form reports that email is not configured instead of pretending an enquiry was sent.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Catalogue and session behavior
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Product and category information is maintained in `src/data/products.ts` and `src/data/categories.ts`. The current static catalogue contains 300 sample products; update the source data to change products and prices.
+- Cart and wishlist state is held in Redux memory for the current page session. It is not written to local storage or a database.
+- Product photography uses Unsplash image URLs; replace them with your own product photography as it becomes available. The supplied logo is `public/logo/logo.jpg`.
+- The storefront supports catalogue browsing, search, category filters, sorting, product details, cart, wishlist and enquiries. It does not process payments, create orders, or provide customer accounts.
 
-## Learn More
+## Commands
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` — local development
+- `npm run lint` — ESLint
+- `npm run build` — production build

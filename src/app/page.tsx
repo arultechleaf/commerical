@@ -1,69 +1,73 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Heart, Sparkles } from "lucide-react";
+import { categories } from "@/data/categories";
+import { products } from "@/data/products";
+import ProductCard from "@/components/products/ProductCard";
 
 export default function Home() {
+  const featured = products.filter((product) => product.featured).slice(0, 8);
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="hero-section">
+        <div className="hero-backdrop" />
+        <div className="shell hero-content">
+          <div className="hero-copy">
+            <span className="eyebrow hero-eyebrow"><Sparkles size={14} /> A little something lovely</span>
+            <h1>For your <em>everyday</em><br />kind of magic.</h1>
+            <p>Sweet accessories, pretty chains and happy little details. Find the piece that feels just like you.</p>
+            <div className="hero-buttons">
+              <Link href="/shop" className="button button-dark">Shop the collection <ArrowRight size={16} /></Link>
+              <Link href="/about" className="hero-story-link">Meet Mihu <span>↗</span></Link>
+            </div>
+            <div className="hero-note"><span className="hero-note-icon"><Heart size={14} fill="currentColor" /></span> Picked with love, just for you</div>
+          </div>
+          <div className="hero-art">
+            <div className="hero-photo" role="img" aria-label="A collection of pretty gold and pearl jewellery" />
+            <div className="hero-logo-card"><Image src="/logo/logo.jpg" alt="Mihu Cute Corner logo" width={104} height={104} /></div>
+            <div className="hero-sticker">Cute<br /><span>looks good<br />on you!</span> ✦</div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="hero-bottom shell"><span>♡</span> Little things. Big smiles. <span>♡</span></div>
+      </section>
+
+      <section className="section shell category-section">
+        <div className="section-heading">
+          <div><span className="eyebrow">Find your favourite</span><h2>A corner for every kind of cute</h2></div>
+          <Link href="/shop" className="inline-link">See everything <ArrowRight size={15} /></Link>
         </div>
-      </main>
-    </div>
+        <div className="category-grid">
+          {categories.map((category, index) => (
+            <Link className={`category-card category-card-${index + 1}`} href={`/categories/${category.slug}`} key={category.slug}>
+              <div className="category-photo" role="img" aria-label={category.name} style={{ backgroundImage: `url("${category.image}")` }} />
+              <div className="category-card-copy"><span>{category.name}</span><small>{category.description}</small><b>Explore <ArrowRight size={14} /></b></div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="section featured-section">
+        <div className="shell">
+          <div className="section-heading">
+            <div><span className="eyebrow">The ones you’ll love</span><h2>Little favourites</h2><p className="section-subtitle">A few hand-picked pieces to make your day a bit brighter.</p></div>
+            <Link href="/shop" className="inline-link">Shop all 300 finds <ArrowRight size={15} /></Link>
+          </div>
+          <div className="product-grid">{featured.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+        </div>
+      </section>
+
+      <section className="story-strip shell">
+        <div className="story-strip-art"><span>♡</span><span>✦</span><span>♡</span></div>
+        <div className="story-strip-copy"><span className="eyebrow">A note from our corner</span><h2>Made to bring a little joy.</h2><p>We believe the smallest things can make the happiest memories. Every Mihu find is chosen to help you celebrate your own style and the people you love.</p><Link href="/about" className="inline-link">A little more about us <ArrowRight size={15} /></Link></div>
+        <div className="story-strip-badge">Cute<br />Trendy<br />Stylish</div>
+      </section>
+
+      <section className="newsletter-band">
+        <div className="shell newsletter-inner">
+          <div><span className="eyebrow">A little love in your inbox</span><h2>Stay in our cute little loop</h2><p>New finds, gift ideas and happy updates. No noise, just the good stuff.</p></div>
+          <Link href="/enquiry" className="button button-dark">Say hello to Mihu <ArrowRight size={16} /></Link>
+        </div>
+      </section>
+    </>
   );
 }
