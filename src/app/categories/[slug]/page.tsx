@@ -21,7 +21,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     <section className="section shell shop-page">
       <div className="category-hero">
         <div className="category-hero-photo" role="img" aria-label={category.name} style={{ backgroundImage: `url("${category.image}")` }} />
-        <div><span className="eyebrow">A little Mihu magic</span><h1>{category.name}</h1><p>{category.description}</p></div>
+        <div><span className="eyebrow">A little Mithu magic</span><h1>{category.name}</h1><p>{category.description}</p></div>
       </div>
       <ProductCatalog initialCategory={category.slug} />
     </section>

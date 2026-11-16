@@ -9,8 +9,8 @@ export default function AboutPage() {
   return (
     <section className="section shell about-page">
       <div className="about-hero">
-        <div className="about-logo"><Image src="/logo/logo.jpg" alt="Mihu Cute Corner" width={240} height={240} /></div>
-        <div><span className="eyebrow">Welcome to our little corner</span><h1>Small details.<br /><em>Big happy energy.</em></h1><p>Mihu Cute Corner is all about finding that little something that feels like you: cheerful hair accessories, sweet chains and everyday sparkle.</p><Link href="/shop" className="button button-dark">Find your little favourite <span>↗</span></Link></div>
+        <div className="about-logo"><Image src="/logo/logo.jpg" alt="Mithu Cute Corner" width={240} height={240} /></div>
+        <div><span className="eyebrow">Welcome to our little corner</span><h1>Small details.<br /><em>Big happy energy.</em></h1><p>Mithu Cute Corner is all about finding that little something that feels like you: cheerful hair accessories, sweet chains and everyday sparkle.</p><Link href="/shop" className="button button-dark">Find your little favourite <span>↗</span></Link></div>
       </div>
       <div className="about-values">
         <article><span><Heart size={20} /></span><h2>Picked with love</h2><p>We look for fun, feel-good pieces that bring an extra little smile to your everyday.</p></article>

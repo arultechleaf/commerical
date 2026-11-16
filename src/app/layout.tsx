@@ -6,10 +6,10 @@ import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Mihu Cute Corner | Cute, Trendy & Stylish Accessories",
-    template: "%s | Mihu Cute Corner",
+    default: "Mithu Cute Corner | Cute, Trendy & Stylish Accessories",
+    template: "%s | Mithu Cute Corner",
   },
-  description: "Shop pretty chains, jewellery, earrings and hair accessories at Mihu Cute Corner. Cute little gifts for everyday moments.",
+  description: "Shop pretty chains, jewellery, earrings and hair accessories at Mithu Cute Corner. Cute little gifts for everyday moments.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

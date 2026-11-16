@@ -1,7 +1,7 @@
 export const storeInfo = {
-  name: "Mihu Cute Corner",
+  name: "Mithu Cute Corner",
   tagline: "Cute · Trendy · Stylish",
-  email: "hello@mihucutecorner.com",
+  email: "hello@mithucutecorner.com",
   phone: "+91 98765 43210",
   location: "India",
 };

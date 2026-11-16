@@ -18,13 +18,13 @@ export default function Home() {
             <p>Sweet accessories, pretty chains and happy little details. Find the piece that feels just like you.</p>
             <div className="hero-buttons">
               <Link href="/shop" className="button button-dark">Shop the collection <ArrowRight size={16} /></Link>
-              <Link href="/about" className="hero-story-link">Meet Mihu <span>↗</span></Link>
+              <Link href="/about" className="hero-story-link">Meet Mithu <span>↗</span></Link>
             </div>
             <div className="hero-note"><span className="hero-note-icon"><Heart size={14} fill="currentColor" /></span> Picked with love, just for you</div>
           </div>
           <div className="hero-art">
             <div className="hero-photo" role="img" aria-label="A collection of pretty gold and pearl jewellery" />
-            <div className="hero-logo-card"><Image src="/logo/logo.jpg" alt="Mihu Cute Corner logo" width={104} height={104} /></div>
+            <div className="hero-logo-card"><Image src="/logo/logo.jpg" alt="Mithu Cute Corner logo" width={104} height={104} /></div>
             <div className="hero-sticker">Cute<br /><span>looks good<br />on you!</span> ✦</div>
           </div>
         </div>
@@ -58,14 +58,14 @@ export default function Home() {
 
       <section className="story-strip shell">
         <div className="story-strip-art"><span>♡</span><span>✦</span><span>♡</span></div>
-        <div className="story-strip-copy"><span className="eyebrow">A note from our corner</span><h2>Made to bring a little joy.</h2><p>We believe the smallest things can make the happiest memories. Every Mihu find is chosen to help you celebrate your own style and the people you love.</p><Link href="/about" className="inline-link">A little more about us <ArrowRight size={15} /></Link></div>
+        <div className="story-strip-copy"><span className="eyebrow">A note from our corner</span><h2>Made to bring a little joy.</h2><p>We believe the smallest things can make the happiest memories. Every Mithu find is chosen to help you celebrate your own style and the people you love.</p><Link href="/about" className="inline-link">A little more about us <ArrowRight size={15} /></Link></div>
         <div className="story-strip-badge">Cute<br />Trendy<br />Stylish</div>
       </section>
 
       <section className="newsletter-band">
         <div className="shell newsletter-inner">
           <div><span className="eyebrow">A little love in your inbox</span><h2>Stay in our cute little loop</h2><p>New finds, gift ideas and happy updates. No noise, just the good stuff.</p></div>
-          <Link href="/enquiry" className="button button-dark">Say hello to Mihu <ArrowRight size={16} /></Link>
+          <Link href="/enquiry" className="button button-dark">Say hello to Mithu <ArrowRight size={16} /></Link>
         </div>
       </section>
     </>

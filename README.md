@@ -1,4 +1,4 @@
-# Mihu Cute Corner
+# Mithu Cute Corner
 
 A static-catalog Next.js storefront for jewellery, chains, bangles, earrings and hair accessories.
 

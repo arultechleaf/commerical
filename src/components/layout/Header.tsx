@@ -48,10 +48,10 @@ export default function Header() {
           >
             {menuOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
-          <Link href="/" className="brand" aria-label="Mihu Cute Corner home">
-            <Image src="/logo/logo.jpg" alt="Mihu Cute Corner — Hair accessories and chains" width={72} height={72} priority />
+          <Link href="/" className="brand" aria-label="Mithu Cute Corner home">
+            <Image src="/logo/logo.jpg" alt="Mithu Cute Corner — Hair accessories and chains" width={72} height={72} priority />
             <span className="brand-copy">
-              <strong>Mihu</strong>
+              <strong>Mithu</strong>
               <small>CUTE CORNER</small>
             </span>
           </Link>

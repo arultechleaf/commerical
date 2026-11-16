@@ -30,7 +30,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <Link href="/shop" className="back-link"><ArrowLeft size={15} /> Back to all finds</Link>
         <div className="product-detail-layout">
           <div className="product-detail-image" role="img" aria-label={product.name} style={{ backgroundImage: `url("${product.image}")` }}>
-            <span className="product-tag detail-tag">A Mihu favourite</span>
+            <span className="product-tag detail-tag">A Mithu favourite</span>
           </div>
           <div className="product-detail-copy">
             <span className="eyebrow">{category?.name ?? product.category}</span>
