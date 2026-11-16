@@ -3,15 +3,17 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { categories } from "@/data/categories";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
 
 const pageSize = 24;
 
 export default function ProductCatalog({
+  products,
   initialCategory = "all",
   initialQuery = "",
 }: {
+  products: Product[];
   initialCategory?: string;
   initialQuery?: string;
 }) {
@@ -38,7 +40,7 @@ export default function ProductCatalog({
     if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name));
     if (sort === "featured") result.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
     return result;
-  }, [category, query, sort]);
+  }, [products, category, query, sort]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const currentPage = Math.min(page, Math.max(totalPages, 1));

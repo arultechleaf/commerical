@@ -47,7 +47,7 @@ const productPhotos = [
   "photo-1611652022419-a9419f74343d",
 ];
 
-export const products: Product[] = categories.flatMap((category, categoryIndex) =>
+export const seedProducts: Product[] = categories.flatMap((category, categoryIndex) =>
   designs[category.slug].flatMap((design, designIndex) =>
     finishes.map((finish, finishIndex) => {
       const number = designIndex * finishes.length + finishIndex + 1;
@@ -68,4 +68,3 @@ export const products: Product[] = categories.flatMap((category, categoryIndex) 
   ),
 );
 
-export const getProduct = (id: string) => products.find((product) => product.id === id);

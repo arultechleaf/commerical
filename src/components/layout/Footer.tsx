@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Camera, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+import InstagramIcon from "@/components/icons/InstagramIcon";
 import { storeInfo } from "@/data/storeInfo";
 
 export default function Footer() {
@@ -33,8 +34,8 @@ export default function Footer() {
           <h3>Say hello</h3>
           <a href={`mailto:${storeInfo.email}`}><Mail size={15} />{storeInfo.email}</a>
           <a href={`tel:${storeInfo.phone.replaceAll(" ", "")}`}><Phone size={15} />{storeInfo.phone}</a>
-          <span><MapPin size={15} />Made with love in {storeInfo.location}</span>
-          <a href="https://instagram.com" target="_blank" rel="noreferrer"><Camera size={15} />Follow along</a>
+          <span><MapPin size={15} />{storeInfo.address}</span>
+          <a href={storeInfo.instagram} target="_blank" rel="noreferrer"><InstagramIcon size={15} />{storeInfo.instagramHandle}</a>
         </div>
       </div>
       <div className="footer-bottom">

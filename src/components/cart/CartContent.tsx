@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearCart, removeFromCart, setQuantity } from "@/redux/slices/cartSlice";
 
-export default function CartContent() {
+export default function CartContent({ products }: { products: Product[] }) {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart);
   const lines = cart.flatMap((line) => {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
@@ -75,6 +75,10 @@ export default function Header() {
               <span className="action-icon"><ShoppingBag size={20} /></span>
               <span className="action-label">Bag</span>
               {cartCount > 0 && <span className="count-badge">{cartCount}</span>}
+            </Link>
+            <Link href="/admin/login" className="header-action" aria-label="Admin login">
+              <span className="action-icon"><User size={20} /></span>
+              <span className="action-label">Login</span>
             </Link>
           </div>
         </div>

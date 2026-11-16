@@ -2,10 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Sparkles } from "lucide-react";
 import { categories } from "@/data/categories";
-import { products } from "@/data/products";
+import { connection } from "next/server";
+import { getProducts } from "@/lib/productStore";
 import ProductCard from "@/components/products/ProductCard";
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+  const products = await getProducts();
   const featured = products.filter((product) => product.featured).slice(0, 8);
   return (
     <>

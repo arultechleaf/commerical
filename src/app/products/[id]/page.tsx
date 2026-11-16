@@ -2,25 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Gift, HeartHandshake } from "lucide-react";
-import { getProduct, products } from "@/data/products";
+import { connection } from "next/server";
+import { getProduct, getProducts } from "@/lib/productStore";
 import { categories } from "@/data/categories";
 import ProductActions from "@/components/products/ProductActions";
 import ProductCard from "@/components/products/ProductCard";
 
-export function generateStaticParams() {
-  return products.map((product) => ({ id: product.id }));
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const product = getProduct(id);
+  const product = await getProduct(id);
   return { title: product?.name ?? "Product not found", description: product?.description };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  await connection();
   const { id } = await params;
-  const product = getProduct(id);
+  const product = await getProduct(id);
   if (!product) notFound();
+  const products = await getProducts();
   const category = categories.find((item) => item.slug === product.category);
   const related = products.filter((item) => item.category === product.category && item.id !== product.id).slice(0, 4);
 

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import ProductCard from "@/components/products/ProductCard";
 import { useAppSelector } from "@/redux/hooks";
 
-export default function WishlistContent() {
+export default function WishlistContent({ products }: { products: Product[] }) {
   const wishlist = useAppSelector((state) => state.wishlist);
   const saved = products.filter((product) => wishlist.includes(product.id));
   if (!saved.length) {
