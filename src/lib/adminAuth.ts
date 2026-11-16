@@ -4,6 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { cookies } from "next/headers";
 import { storageDir } from "@/lib/productStore";
+import saved from "@/data/adminCredentials.json";
 
 const cookieName = "mithu_admin";
 const adminFile = path.join(storageDir, "admin.json");
@@ -18,6 +19,12 @@ function safeEqual(a: string, b: string) {
   return x.length === y.length && timingSafeEqual(x, y);
 }
 
+// Fallback when no environment variables are set: the login saved in
+// src/data/adminCredentials.json (password stored only as a salted scrypt hash).
+function savedCredentials(): AdminRecord {
+  return { ...saved, secret: createHmac("sha256", "mithu-secret").update(saved.hash).digest("hex") };
+}
+
 // The login is kept in storage/admin.json. The password is stored as a salted
 // scrypt hash (one-way, so it can never be decrypted back to plain text).
 // On first run the record is created from ADMIN_EMAIL / ADMIN_PASSWORD in .env.local.
@@ -27,7 +34,7 @@ async function readAdmin(): Promise<AdminRecord | null> {
   } catch {
     const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
     const password = process.env.ADMIN_PASSWORD;
-    if (!email || !password) return null;
+    if (!email || !password) return savedCredentials();
     const salt = randomBytes(16).toString("hex");
     const record: AdminRecord = { email, salt, hash: hashPassword(password, salt), secret: randomBytes(32).toString("hex") };
     try {
