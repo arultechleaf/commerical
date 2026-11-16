@@ -42,3 +42,4 @@ next-env.d.ts
 
 # local product data and uploaded images
 /storage/
+/deploy/
