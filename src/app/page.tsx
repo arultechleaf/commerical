@@ -4,12 +4,17 @@ import { ArrowRight, Heart, Sparkles } from "lucide-react";
 import { categories } from "@/data/categories";
 import { connection } from "next/server";
 import { getProducts } from "@/lib/productStore";
+import { isNewArrival } from "@/lib/isNew";
 import ProductCard from "@/components/products/ProductCard";
 
 export default async function Home() {
   await connection();
   const products = await getProducts();
   const featured = products.filter((product) => product.featured).slice(0, 8);
+  const newArrivals = products
+    .filter((product) => isNewArrival(product))
+    .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
+    .slice(0, 3);
   return (
     <>
       <section className="hero-section">
@@ -56,6 +61,24 @@ export default async function Home() {
             <Link href="/shop" className="inline-link">Shop all 300 finds <ArrowRight size={15} /></Link>
           </div>
           <div className="product-grid">{featured.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+        </div>
+      </section>
+
+      <section className="section new-section">
+        <div className="shell">
+          <div className="section-heading">
+            <div><span className="eyebrow new-eyebrow"><span className="new-dot" /> Just landed</span><h2>New arrivals</h2><p className="section-subtitle">Fresh off the shelf, and more cute things on the way.</p></div>
+            <Link href="/shop?filter=new" className="inline-link">See all new <ArrowRight size={15} /></Link>
+          </div>
+          <div className="new-grid">
+            {newArrivals.map((product) => <ProductCard key={product.id} product={product} />)}
+            <Link href="/enquiry" className="coming-soon-card">
+              <span className="coming-soon-art" aria-hidden="true">🦋</span>
+              <small>Coming soon</small>
+              <strong>Something new is on its way</strong>
+              <em>Ask to be first to know <ArrowRight size={14} /></em>
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/providers";
+import RobotMascot from "@/components/RobotMascot";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { getProducts } from "@/lib/productStore";
+import { connection } from "next/server";
 
 export const metadata: Metadata = {
   title: {
@@ -12,7 +15,14 @@ export const metadata: Metadata = {
   description: "Shop pretty chains, jewellery, earrings and hair accessories at Mithu Cute Corner. Cute little gifts for everyday moments.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  await connection();
+  const products = await getProducts();
+  const recommendations = [
+    ...products.filter((product) => product.category === "bangles"),
+    ...products.filter((product) => product.category !== "bangles"),
+  ].slice(0, 8);
+
   return (
     <html lang="en">
       <body>
@@ -20,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Header />
           <main className="page-main">{children}</main>
           <Footer />
+          <RobotMascot products={recommendations} />
         </Providers>
       </body>
     </html>

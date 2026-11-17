@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import InstagramIcon from "@/components/icons/InstagramIcon";
+import { policies } from "@/data/policies";
 import { storeInfo } from "@/data/storeInfo";
 
 export default function Footer() {
@@ -30,11 +32,16 @@ export default function Footer() {
           <Link href="/cart">Your shopping bag</Link>
           <Link href="/wishlist">Your wishlist</Link>
         </div>
+        <div className="footer-links">
+          <h3>Policies</h3>
+          {policies.map((policy) => <Link key={policy.slug} href={`/policies/${policy.slug}`}>{policy.title}</Link>)}
+        </div>
         <div className="footer-links footer-contact">
           <h3>Say hello</h3>
-          <a href={`mailto:${storeInfo.email}`}><Mail size={15} />{storeInfo.email}</a>
+          <a href={storeInfo.gmailCompose} target="_blank" rel="noopener noreferrer"><Mail size={15} />{storeInfo.email}</a>
           <a href={`tel:${storeInfo.phone.replaceAll(" ", "")}`}><Phone size={15} />{storeInfo.phone}</a>
-          <span><MapPin size={15} />{storeInfo.address}</span>
+          <a href={`https://wa.me/${storeInfo.whatsapp}?text=${encodeURIComponent("Hi Mithu Cute Corner!")}`} target="_blank" rel="noopener noreferrer"><WhatsAppIcon size={15} />WhatsApp {storeInfo.phone}</a>
+          <a href={storeInfo.mapUrl} target="_blank" rel="noopener noreferrer"><MapPin size={15} />{storeInfo.address}</a>
           <a href={storeInfo.instagram} target="_blank" rel="noreferrer"><InstagramIcon size={15} />{storeInfo.instagramHandle}</a>
         </div>
       </div>

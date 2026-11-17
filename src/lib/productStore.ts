@@ -41,18 +41,25 @@ export async function getProduct(id: string) {
   return (await readAll()).find((product) => product.id === id);
 }
 
-export async function saveProduct(input: Omit<Product, "id"> & { id?: string }) {
+export async function saveProduct(input: Omit<Product, "id"> & { id?: string; customId?: string }) {
+  const { customId, ...rest } = input;
+  input = rest;
   const products = await readAll();
   if (input.id) {
     const index = products.findIndex((product) => product.id === input.id);
     if (index === -1) throw new Error("Product not found");
-    products[index] = { ...input, id: input.id };
+    const previous = products[index];
+    const createdAt = previous.createdAt ?? (input.newArrival ? Date.now() : undefined);
+    products[index] = { ...input, id: input.id, createdAt };
+  } else if (customId) {
+    if (products.some((product) => product.id === customId)) throw new Error(`Product code ${customId.toUpperCase()} is already used.`);
+    products.unshift({ ...input, id: customId, createdAt: Date.now() });
   } else {
     const numbers = products
       .filter((product) => product.category === input.category)
       .map((product) => Number(product.id.split("-").pop()) || 0);
     const next = Math.max(0, ...numbers) + 1;
-    products.unshift({ ...input, id: `${input.category}-${String(next).padStart(3, "0")}` });
+    products.unshift({ ...input, id: `${input.category}-${String(next).padStart(3, "0")}`, createdAt: Date.now() });
   }
   await writeAll(products);
 }

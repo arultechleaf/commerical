@@ -5,10 +5,12 @@ A static-catalog Next.js storefront for jewellery, chains, bangles, earrings and
 ## Run locally
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and add your EmailJS service ID, template ID and public key.
+2. Copy `.env.example` to `.env.local` and add your EmailJS settings.
 3. Start the development server with `npm run dev`.
 
 The enquiry form uses EmailJS in the browser. Configure an EmailJS template with `from_name`, `from_email`, `phone`, `subject`, `message` and `reply_to` parameters. Without those three environment values, the form reports that email is not configured instead of pretending an enquiry was sent.
+
+The storefront includes a floating, animated robot mascot with a rotating speech bubble. Clicking it opens a product-recommendation panel with links to product details and a WhatsApp contact button. Customer mobile-number/OTP login is not configured.
 
 ## Catalogue and session behavior
 

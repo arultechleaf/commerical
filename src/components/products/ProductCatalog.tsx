@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import type { Product } from "@/types/product";
+import { isNewArrival } from "@/lib/isNew";
 import ProductCard from "./ProductCard";
 
 const pageSize = 24;
@@ -12,24 +13,39 @@ export default function ProductCatalog({
   products,
   initialCategory = "all",
   initialQuery = "",
+  initialMin,
+  initialMax,
+  initialFilter = "all",
 }: {
   products: Product[];
   initialCategory?: string;
   initialQuery?: string;
+  initialMin?: number;
+  initialMax?: number;
+  initialFilter?: string;
 }) {
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState("featured");
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState(initialQuery);
+  const [min, setMin] = useState(initialMin);
+  const [max, setMax] = useState(initialMax);
+  const [flag, setFlag] = useState(initialFilter);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const result = products.filter((product) => {
+      if (min !== undefined && product.price < min) return false;
+      if (max !== undefined && product.price > max) return false;
+      if (flag === "new" && !isNewArrival(product)) return false;
+      if (flag === "sale" && !product.compareAtPrice) return false;
+      if (flag === "best" && !product.featured) return false;
       const selectedCategory = category === "all" || product.category === category;
       const categoryName = categories.find((item) => item.slug === product.category)?.name ?? "";
       const matchesQuery =
         !normalized ||
         product.name.toLowerCase().includes(normalized) ||
+        product.material.toLowerCase().includes(normalized) ||
         product.category.includes(normalized) ||
         categoryName.toLowerCase().includes(normalized);
       return selectedCategory && matchesQuery;
@@ -38,9 +54,18 @@ export default function ProductCatalog({
     if (sort === "price-low") result.sort((a, b) => a.price - b.price);
     if (sort === "price-high") result.sort((a, b) => b.price - a.price);
     if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name));
-    if (sort === "featured") result.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+    if (flag === "new") result.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+    else if (sort === "featured") result.sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
     return result;
-  }, [products, category, query, sort]);
+  }, [products, category, query, sort, min, max, flag]);
+
+  const pills = [
+    { label: "All products", active: !query && min === undefined && max === undefined && flag === "all", set: () => { setQuery(""); setMin(undefined); setMax(undefined); setFlag("all"); } },
+    { label: "Under ₹300", active: max === 300 && min === undefined, set: () => { setQuery(""); setMin(undefined); setMax(300); setFlag("all"); } },
+    { label: "On sale", active: flag === "sale", set: () => { setQuery(""); setMin(undefined); setMax(undefined); setFlag("sale"); } },
+    { label: "Bestsellers", active: flag === "best", set: () => { setQuery(""); setMin(undefined); setMax(undefined); setFlag("best"); } },
+    { label: "Pearl", active: query === "pearl", set: () => { setQuery("pearl"); setMin(undefined); setMax(undefined); setFlag("all"); } },
+  ];
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const currentPage = Math.min(page, Math.max(totalPages, 1));
@@ -53,6 +78,13 @@ export default function ProductCatalog({
 
   return (
     <>
+      <div className="quick-pills">
+        {pills.map((pill) => (
+          <button key={pill.label} className={`quick-pill ${pill.active ? "is-active" : ""}`} onClick={() => { pill.set(); setPage(1); }}>
+            {pill.label}
+          </button>
+        ))}
+      </div>
       <div className="catalog-toolbar">
         <div className="catalog-filters">
           <label className="filter-field">
@@ -93,8 +125,8 @@ export default function ProductCatalog({
       ) : (
         <div className="empty-state">
           <span className="empty-state-icon">♡</span>
-          <h2>No matches just yet</h2>
-          <p>Try a different search or browse all of our cute finds.</p>
+          <h2>{flag === "new" ? "No new arrivals yet" : "No matches just yet"}</h2>
+          <p>{flag === "new" ? "Fresh pieces are on their way. Browse everything in the meantime." : "Try a different search or browse all of our cute finds."}</p>
           <Link href="/shop" className="button button-dark" onClick={() => { setQuery(""); changeCategory("all"); }}>See all products</Link>
         </div>
       )}

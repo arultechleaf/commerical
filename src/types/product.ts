@@ -16,4 +16,5 @@ export type Product = {
   material: string;
   featured?: boolean;
   newArrival?: boolean;
+  createdAt?: number;
 };
