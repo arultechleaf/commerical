@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { categories } from "@/data/categories";
 import { isAdmin } from "@/lib/adminAuth";
 import { getProducts } from "@/lib/productStore";
+import ImageField from "@/components/forms/ImageField";
 import { deleteProductAction, logout, saveProductAction } from "./actions";
 
 export const metadata: Metadata = { title: "Manage products", robots: { index: false } };
@@ -66,7 +67,7 @@ export default async function AdminPage({
         </div>
         <label>Material / finish<input name="material" defaultValue={editing?.material} /></label>
         <label>Description<textarea name="description" rows={3} defaultValue={editing?.description} /></label>
-        <label>Upload image (JPG, PNG, SVG, WEBP, GIF, AVIF up to 8 MB){editing ? " (leave empty to keep the current one)" : ""}<input name="imageFile" type="file" accept=".jpg,.jpeg,.png,.svg,.webp,.gif,.avif,image/*" /></label>
+        <ImageField label={`Upload image (JPG, PNG, SVG, WEBP, GIF, AVIF)${editing ? " (leave empty to keep the current one)" : ""}`} />
         <label>Or paste an image link<input name="imageUrl" type="url" placeholder="https://" /></label>
         {editing && <div className="admin-thumb" style={{ backgroundImage: `url("${editing.image}")` }} role="img" aria-label="Current image" />}
         <div className="admin-checks">

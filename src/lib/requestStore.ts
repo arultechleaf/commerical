@@ -2,6 +2,7 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { storageDir } from "@/lib/productStore";
+import { blobEnabled, privateName, readJson, writeJson } from "@/lib/blobStore";
 
 export type RequestKind = "enquiry" | "order";
 
@@ -22,6 +23,9 @@ const requestsFile = path.join(storageDir, "requests.json");
 const prefix: Record<RequestKind, string> = { enquiry: "ENQ", order: "ORD" };
 
 export async function getRequests(): Promise<RequestRecord[]> {
+  if (blobEnabled) {
+    try { return (await readJson<RequestRecord[]>(privateName("data/requests"))) ?? []; } catch { return []; }
+  }
   try {
     return JSON.parse(await fs.readFile(requestsFile, "utf8")) as RequestRecord[];
   } catch {
@@ -40,6 +44,10 @@ export async function saveRequest(input: Omit<RequestRecord, "id" | "createdAt">
   const id = `${prefix[input.kind]}-${String(Math.max(0, ...used) + 1).padStart(4, "0")}`;
   const record: RequestRecord = { ...input, id, createdAt: Date.now() };
   try {
+    if (blobEnabled) {
+      await writeJson(privateName("data/requests"), [record, ...all]);
+      return { id, saved: true };
+    }
     await fs.mkdir(storageDir, { recursive: true });
     const tmp = `${requestsFile}.tmp`;
     await fs.writeFile(tmp, JSON.stringify([record, ...all], null, 2), "utf8");

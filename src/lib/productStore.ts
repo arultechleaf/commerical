@@ -3,12 +3,19 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { seedProducts } from "@/data/products";
 import type { Product } from "@/types/product";
+import { blobEnabled, readJson, writeJson } from "@/lib/blobStore";
+import { del, put } from "@vercel/blob";
 
 export const storageDir = path.join(process.cwd(), "storage");
 export const uploadsDir = path.join(storageDir, "uploads");
 const productsFile = path.join(storageDir, "products.json");
 
 async function readAll(): Promise<Product[]> {
+  if (blobEnabled) {
+    // Online copy wins. If it does not exist yet, start from the committed file below.
+    const online = await readJson<Product[]>("data/products.json");
+    if (online) return online;
+  }
   try {
     return JSON.parse(await fs.readFile(productsFile, "utf8")) as Product[];
   } catch {
@@ -24,6 +31,7 @@ export const readOnlyMessage =
 
 async function writeAll(products: Product[]) {
   try {
+    if (blobEnabled) return await writeJson("data/products.json", products);
     await fs.mkdir(storageDir, { recursive: true });
     const tmp = `${productsFile}.tmp`;
     await fs.writeFile(tmp, JSON.stringify(products, null, 2), "utf8");
@@ -83,6 +91,14 @@ export async function saveUpload(file: File) {
   const data = Buffer.from(await file.arrayBuffer());
   if (ext === ".svg" && !/<svg[\s>]/i.test(data.toString("utf8", 0, 4096))) throw new Error("That file is not a valid SVG image.");
   const name = `${crypto.randomUUID()}${ext}`;
+  if (blobEnabled) {
+    try {
+      const blob = await put(`uploads/${name}`, data, { access: "public", addRandomSuffix: false, contentType: file.type || undefined });
+      return blob.url;
+    } catch {
+      throw new Error("Could not upload the image to online storage. Please try again.");
+    }
+  }
   try {
     await fs.mkdir(uploadsDir, { recursive: true });
     await fs.writeFile(path.join(uploadsDir, name), data);
@@ -93,6 +109,10 @@ export async function saveUpload(file: File) {
 }
 
 export async function removeUpload(imagePath: string) {
+  if (blobEnabled && /^https:\/\/[^/]+\.blob\.vercel-storage\.com\/uploads\//.test(imagePath)) {
+    try { await del(imagePath); } catch {}
+    return;
+  }
   if (!imagePath.startsWith("/uploads/")) return;
   const name = path.basename(imagePath);
   await fs.rm(path.join(uploadsDir, name), { force: true });
