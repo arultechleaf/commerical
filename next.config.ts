@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Make sure the saved product list and uploaded photos are shipped with the deployed site.
+  outputFileTracingIncludes: {
+    "/*": ["./storage/products.json", "./storage/uploads/**/*"],
+  },
   images: {
     // Product photos are resized per screen; these are the online hosts allowed.
     remotePatterns: [
