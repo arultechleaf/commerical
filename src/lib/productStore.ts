@@ -27,7 +27,7 @@ async function readAll(): Promise<Product[]> {
 }
 
 export const readOnlyMessage =
-  "This hosting has a read-only disk, so changes can't be saved here. Run the site on a server with a writable disk (own PC or VPS), or connect a database.";
+  "Saving is not set up on this hosting yet. In the Vercel dashboard open Storage, create a Blob store and connect it to this project (it adds BLOB_READ_WRITE_TOKEN), then redeploy.";
 
 async function writeAll(products: Product[]) {
   try {
