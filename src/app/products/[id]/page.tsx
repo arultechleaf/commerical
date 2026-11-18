@@ -1,3 +1,4 @@
+import ProductImage from "@/components/products/ProductImage";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,7 +29,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <section className="shell product-detail">
         <Link href="/shop" className="back-link"><ArrowLeft size={15} /> Back to all finds</Link>
         <div className="product-detail-layout">
-          <div className="product-detail-image" role="img" aria-label={product.name} style={{ backgroundImage: `url("${product.image}")` }}>
+          <div className="product-detail-image">
+            <ProductImage src={product.image} alt={product.name} sizes="(max-width: 900px) 100vw, 560px" priority />
             <span className="product-tag detail-tag">A Mithu favourite</span>
           </div>
           <div className="product-detail-copy">

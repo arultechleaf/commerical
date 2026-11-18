@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
 import type { Product } from "@/types/product";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import ProductImage from "./ProductImage";
 import { addToCart } from "@/redux/slices/cartSlice";
 import { isNewArrival } from "@/lib/isNew";
 import { toggleWishlist } from "@/redux/slices/wishlistSlice";
@@ -17,12 +18,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="product-card">
-      <div
-        className="product-photo"
-        role="img"
-        aria-label={product.name}
-        style={{ backgroundImage: `url("${product.image}")` }}
-      >
+      <div className="product-photo">
+        <ProductImage src={product.image} alt={product.name} sizes="(max-width: 680px) 50vw, (max-width: 1100px) 33vw, 280px" />
         <Link
           href={`/products/${product.id}`}
           className="product-image-link"

@@ -2,6 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  images: {
+    // Product photos are resized per screen; these are the online hosts allowed.
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
+  },
   // Let a phone on the same Wi-Fi open the laptop's dev server (http://192.168.x.x:3000).
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   experimental: {
