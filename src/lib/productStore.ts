@@ -3,8 +3,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { seedProducts } from "@/data/products";
 import type { Product } from "@/types/product";
-import { blobEnabled, readJson, writeJson } from "@/lib/blobStore";
-import { del, put } from "@vercel/blob";
+import { blobEnabled, FILES_ROUTE, putImage, readJson, writeJson } from "@/lib/blobStore";
+import { del } from "@vercel/blob";
 
 export const storageDir = path.join(process.cwd(), "storage");
 export const uploadsDir = path.join(storageDir, "uploads");
@@ -93,8 +93,7 @@ export async function saveUpload(file: File) {
   const name = `${crypto.randomUUID()}${ext}`;
   if (blobEnabled) {
     try {
-      const blob = await put(`uploads/${name}`, data, { access: "public", addRandomSuffix: false, contentType: file.type || undefined });
-      return blob.url;
+      return await putImage(`uploads/${name}`, data, file.type || undefined);
     } catch {
       throw new Error("Could not upload the image to online storage. Please try again.");
     }
@@ -109,8 +108,9 @@ export async function saveUpload(file: File) {
 }
 
 export async function removeUpload(imagePath: string) {
-  if (blobEnabled && /^https:\/\/[^/]+\.blob\.vercel-storage\.com\/uploads\//.test(imagePath)) {
-    try { await del(imagePath); } catch {}
+  if (blobEnabled && (/^https:\/\/[^/]+\.blob\.vercel-storage\.com\/uploads\//.test(imagePath) || imagePath.startsWith(`${FILES_ROUTE}uploads/`))) {
+    // Public photos are removed by their link, private ones by their name in the store.
+    try { await del(imagePath.startsWith(FILES_ROUTE) ? imagePath.slice(FILES_ROUTE.length) : imagePath); } catch {}
     return;
   }
   if (!imagePath.startsWith("/uploads/")) return;
