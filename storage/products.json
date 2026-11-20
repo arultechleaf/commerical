@@ -5,11 +5,12 @@
     "category": "jewellery",
     "price": 120,
     "compareAtPrice": 249,
-    "image": "/uploads/ee294609-f2af-48c6-a2af-96b3564e662b.jpg",
+    "image": "/uploads/2b2b31ff-640b-4ffd-93ef-92930264c358.jpg",
     "description": "Petal Glow is a lovely little finishing touch, selected for its playful detail and easy-to-style feel. A thoughtful treat for you or someone special.",
     "material": "Rose-gold tone",
-    "featured": false,
-    "newArrival": false
+    "featured": true,
+    "newArrival": true,
+    "createdAt": 1795077049507
   },
   {
     "id": "jewellery-002",
