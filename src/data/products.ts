@@ -58,7 +58,7 @@ export const seedProducts: Product[] = categories.flatMap((category, categoryInd
         category: category.slug,
         price,
         compareAtPrice: price + 100 + (designIndex % 4) * 25,
-        image: `https://images.unsplash.com/${productPhotos[(designIndex + finishIndex + categoryIndex) % productPhotos.length]}?auto=format&fit=crop&w=900&q=85`,
+        image: `/images/${productPhotos[(designIndex + finishIndex + categoryIndex) % productPhotos.length]}.jpg`,
         description: `${design} is a lovely little finishing touch, selected for its playful detail and easy-to-style feel. A thoughtful treat for you or someone special.`,
         material: finish.material,
         featured: number <= 4 && designIndex < 4,
