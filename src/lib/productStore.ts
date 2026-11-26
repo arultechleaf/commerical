@@ -36,7 +36,11 @@ async function writeAll(products: Product[]) {
     const tmp = `${productsFile}.tmp`;
     await fs.writeFile(tmp, JSON.stringify(products, null, 2), "utf8");
     await fs.rename(tmp, productsFile);
-  } catch {
+  } catch (error) {
+    if (blobEnabled) {
+      console.error("Blob save failed", error);
+      throw new Error(`Saving to Vercel Blob failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
     throw new Error(readOnlyMessage);
   }
 }
