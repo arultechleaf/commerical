@@ -66,7 +66,6 @@ export default function RobotMascot({ products }: { products: Product[] }) {
                   <b>₹{product.price.toLocaleString("en-IN")}</b>
                   {product.compareAtPrice && <del>₹{product.compareAtPrice.toLocaleString("en-IN")}</del>}
                 </span>
-                <span className="robot-product-code">Code: {product.id.toUpperCase()}</span>
               </span>
             </a>
           )) : <p className="robot-products-empty">Our products are being updated. Please check back soon.</p>}

@@ -4,7 +4,8 @@ import { categories } from "@/data/categories";
 import { isAdmin } from "@/lib/adminAuth";
 import { getProducts } from "@/lib/productStore";
 import ImageField from "@/components/forms/ImageField";
-import { deleteProductAction, logout, saveProductAction } from "./actions";
+import { getSlides, SLIDE_COUNT } from "@/lib/marqueeStore";
+import { clearSlideAction, deleteProductAction, logout, saveProductAction, saveSlideAction } from "./actions";
 
 export const metadata: Metadata = { title: "Manage products", robots: { index: false } };
 
@@ -16,7 +17,7 @@ export default async function AdminPage({
   if (!(await isAdmin())) redirect("/admin/login");
   const { edit, category = "all", q, error, saved, deleted } = await searchParams;
   const query = typeof q === "string" ? q.trim() : "";
-  const products = await getProducts();
+  const [products, slides] = await Promise.all([getProducts(), getSlides()]);
   const editing = edit ? products.find((product) => product.id === edit) : undefined;
   const normalizedQuery = query.toLowerCase();
   const visible = products.filter((product) => {
@@ -79,6 +80,41 @@ export default async function AdminPage({
           {editing && <a className="button button-outline" href={`/admin${listParams.size ? `?${listParams}` : ""}`}>Cancel</a>}
         </div>
       </form>
+
+      <div className="admin-card" id="strip">
+        <h2>Home page scrolling images ({SLIDE_COUNT})</h2>
+        <p className="section-subtitle">These images scroll across the top of the home page, above the main banner. Until you set any, it shows 5 featured products.</p>
+        <div className="admin-strip-grid">
+          {slides.map((slide, slot) => (
+            <div className="admin-strip-slot" key={slot}>
+              <b>Image {slot + 1}</b>
+              {slide.image
+                ? <div className="admin-thumb" style={{ backgroundImage: `url("${slide.image}")` }} role="img" aria-label={`Image ${slot + 1}`} />
+                : <div className="admin-strip-empty">Empty</div>}
+              <form action={saveSlideAction} className="admin-form">
+                <input type="hidden" name="slot" value={slot} />
+                <ImageField label={slide.image ? "Replace image (optional)" : "Upload image"} />
+                <label>Or image link<input name="imageUrl" type="url" placeholder="https://" /></label>
+                <label>Title (optional)<input name="title" maxLength={60} defaultValue={slide.title} /></label>
+                <label>Offer badge (optional, e.g. 50% OFF)<input name="offer" maxLength={30} defaultValue={slide.offer} placeholder="50% OFF" /></label>
+                <div className="admin-row">
+                  <label>Price (₹)<input name="price" type="number" min="0" defaultValue={slide.price} /></label>
+                  <label>Old price (₹)<input name="oldPrice" type="number" min="0" defaultValue={slide.oldPrice} /></label>
+                </div>
+                <label>Product code for heart &amp; cart (optional, e.g. CHAINS-008)<input name="productId" maxLength={40} defaultValue={slide.productId?.toUpperCase()} placeholder="CHAINS-008" /></label>
+                <label>Opens page (optional, e.g. /shop)<input name="link" defaultValue={slide.link} placeholder="/shop" /></label>
+                <button className="button button-dark" type="submit">Save image {slot + 1}</button>
+              </form>
+              {slide.image && (
+                <form action={clearSlideAction}>
+                  <input type="hidden" name="slot" value={slot} />
+                  <button className="button button-outline admin-delete" type="submit">Remove</button>
+                </form>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <form className="admin-search" action="/admin">
         <input type="hidden" name="category" value={category} />

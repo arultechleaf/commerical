@@ -49,7 +49,6 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="product-card-info">
         <Link href={`/products/${product.id}`} className="product-title">{product.name}</Link>
-        <span className="product-code">Code: {product.id.toUpperCase()}</span>
         <div className="product-price">
           {product.compareAtPrice && <del>₹{product.compareAtPrice.toLocaleString("en-IN")}</del>}
           <strong>₹{product.price.toLocaleString("en-IN")}</strong>

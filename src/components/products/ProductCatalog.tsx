@@ -2,12 +2,26 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { categories } from "@/data/categories";
 import type { Product } from "@/types/product";
 import { isNewArrival } from "@/lib/isNew";
 import ProductCard from "./ProductCard";
 
-const pageSize = 24;
+const pageSize = 36;
+
+// Page buttons to show: always first and last, the current page and its neighbours, "…" for gaps.
+// e.g. page 1 of 13 -> 1 2 … 13, page 6 of 13 -> 1 … 5 6 7 … 13
+function pageNumbers(current: number, total: number): (number | "…")[] {
+  const wanted = new Set([1, total, current - 1, current, current + 1].filter((n) => n >= 1 && n <= total));
+  const sorted = [...wanted].sort((a, b) => a - b);
+  const out: (number | "…")[] = [];
+  sorted.forEach((n, i) => {
+    if (i > 0 && n - sorted[i - 1] > 1) out.push(n - sorted[i - 1] === 2 ? n - 1 : "…");
+    out.push(n);
+  });
+  return out;
+}
 
 export default function ProductCatalog({
   products,
@@ -71,6 +85,12 @@ export default function ProductCatalog({
   const currentPage = Math.min(page, Math.max(totalPages, 1));
   const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  function goTo(next: number) {
+    setPage(next);
+    // Bring the shopper back to the top of the list for the new page.
+    document.querySelector(".catalog-result-row")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function changeCategory(value: string) {
     setCategory(value);
     setPage(1);
@@ -78,6 +98,7 @@ export default function ProductCatalog({
 
   return (
     <>
+      <div className="catalog-panel">
       <div className="quick-pills">
         {pills.map((pill) => (
           <button key={pill.label} className={`quick-pill ${pill.active ? "is-active" : ""}`} onClick={() => { pill.set(); setPage(1); }}>
@@ -114,6 +135,7 @@ export default function ProductCatalog({
           </select>
         </label>
       </div>
+      </div>
       <div className="catalog-result-row">
         <p><strong>{filtered.length}</strong> pretty finds to browse</p>
         {category !== "all" && <button className="text-button" onClick={() => changeCategory("all")}>Clear category</button>}
@@ -130,12 +152,37 @@ export default function ProductCatalog({
           <Link href="/shop" className="button button-dark" onClick={() => { setQuery(""); changeCategory("all"); }}>See all products</Link>
         </div>
       )}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button className="button button-outline" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <button className="button button-outline" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>Next</button>
-        </div>
+      {filtered.length > 0 && (
+        <nav className="pager" aria-label="Product pages">
+          <p className="pager-count">
+            Showing <b>{(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filtered.length)}</b> of <b>{filtered.length}</b> Products
+          </p>
+          {totalPages > 1 && (
+            <div className="pager-buttons">
+              <button className="pager-arrow" disabled={currentPage === 1} onClick={() => goTo(currentPage - 1)} aria-label="Previous page">
+                <ChevronLeft size={22} />
+              </button>
+              {pageNumbers(currentPage, totalPages).map((item, i) =>
+                item === "…" ? (
+                  <span key={`gap-${i}`} className="pager-gap" aria-hidden="true">…</span>
+                ) : (
+                  <button
+                    key={item}
+                    className={`pager-page ${item === currentPage ? "is-current" : ""}`}
+                    aria-current={item === currentPage ? "page" : undefined}
+                    aria-label={`Page ${item}`}
+                    onClick={() => goTo(item)}
+                  >
+                    {item}
+                  </button>
+                ),
+              )}
+              <button className="pager-arrow" disabled={currentPage === totalPages} onClick={() => goTo(currentPage + 1)} aria-label="Next page">
+                <ChevronRight size={22} />
+              </button>
+            </div>
+          )}
+        </nav>
       )}
     </>
   );

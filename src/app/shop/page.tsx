@@ -13,7 +13,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     <section className="section shell shop-page">
       <div className="page-heading">
         <span className="eyebrow">The Mithu collection</span>
-        <h1>Find your next little favourite</h1>
+        <h1>Find your next <em>little favourite</em></h1>
         <p>Cute, trendy and stylish finds, ready to make someone smile.</p>
       </div>
       <ProductCatalog

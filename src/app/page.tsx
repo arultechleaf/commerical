@@ -6,6 +6,9 @@ import { connection } from "next/server";
 import { getProducts } from "@/lib/productStore";
 import { isNewArrival } from "@/lib/isNew";
 import ProductCard from "@/components/products/ProductCard";
+import ImageMarquee from "@/components/home/ImageMarquee";
+import NewArrivalSpotlight from "@/components/home/NewArrivalSpotlight";
+import { getSlides } from "@/lib/marqueeStore";
 
 export default async function Home() {
   await connection();
@@ -15,8 +18,31 @@ export default async function Home() {
     .filter((product) => isNewArrival(product))
     .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
     .slice(0, 3);
+  // Newest "just arrived" product for the big spotlight card (falls back to the newest product overall).
+  const spotlight = newArrivals[0] ?? [...products].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))[0];
+  // Enough copies of the categories to be wider than any screen.
+  const categoryLoop = Array.from({ length: Math.ceil(8 / categories.length) }, () => categories).flat();
+  const chosen = (await getSlides()).filter((slide) => slide.image);
+  const slides = chosen.length
+    ? chosen
+    : featured.slice(0, 5).map((product) => {
+        const off = product.compareAtPrice && product.compareAtPrice > product.price
+          ? Math.round((1 - product.price / product.compareAtPrice) * 100)
+          : 0;
+        return {
+          image: product.image,
+          title: product.name,
+          link: `/products/${product.id}`,
+          offer: off ? `${off}% OFF` : "",
+          price: product.price,
+          oldPrice: off ? product.compareAtPrice : undefined,
+          productId: product.id,
+        };
+      });
   return (
     <>
+      <ImageMarquee slides={slides} />
+
       <section className="hero-section">
         <div className="hero-backdrop" />
         <div className="shell hero-content">
@@ -44,15 +70,24 @@ export default async function Home() {
           <div><span className="eyebrow">Find your favourite</span><h2>A corner for every kind of cute</h2></div>
           <Link href="/shop" className="inline-link">See everything <ArrowRight size={15} /></Link>
         </div>
-        <div className="category-grid">
-          {categories.map((category, index) => (
-            <Link className={`category-card category-card-${index + 1}`} href={`/categories/${category.slug}`} key={category.slug}>
+      </section>
+      {/* Category cards scroll in an endless loop (list drawn twice, track moves by one copy). */}
+      <div className="category-marquee">
+        <div className="category-track">
+          {[...categoryLoop, ...categoryLoop].map((category, index) => (
+            <Link
+              className="category-card"
+              href={`/categories/${category.slug}`}
+              key={index}
+              aria-hidden={index >= categories.length || undefined}
+              tabIndex={index >= categories.length ? -1 : undefined}
+            >
               <div className="category-photo" role="img" aria-label={category.name} style={{ backgroundImage: `url("${category.image}")` }} />
               <div className="category-card-copy"><span>{category.name}</span><small>{category.description}</small><b>Explore <ArrowRight size={14} /></b></div>
             </Link>
           ))}
         </div>
-      </section>
+      </div>
 
       <section className="section featured-section">
         <div className="shell">
@@ -67,17 +102,17 @@ export default async function Home() {
       <section className="section new-section">
         <div className="shell">
           <div className="section-heading">
-            <div><span className="eyebrow new-eyebrow"><span className="new-dot" /> Just landed</span><h2>New arrivals</h2><p className="section-subtitle">Fresh off the shelf, and more cute things on the way.</p></div>
-            <Link href="/shop?filter=new" className="inline-link">See all new <ArrowRight size={15} /></Link>
+            <div><span className="eyebrow new-eyebrow"><span className="new-dot" /> Just landed</span><h2>New <em className="new-title-accent">arrivals</em></h2><p className="section-subtitle">Fresh off the shelf, and more cute things on the way.</p></div>
+            <Link href="/shop?filter=new" className="see-new-pill">See all new <ArrowRight size={15} /></Link>
           </div>
-          <div className="new-grid">
-            {newArrivals.map((product) => <ProductCard key={product.id} product={product} />)}
-            <Link href="/enquiry" className="coming-soon-card">
-              <span className="coming-soon-art" aria-hidden="true">🦋</span>
+          <div className="spotlight-row">
+            {spotlight && <NewArrivalSpotlight product={spotlight} />}
+            <div className="soon-card">
+              <span className="soon-art" aria-hidden="true"><Sparkles size={30} fill="currentColor" /></span>
               <small>Coming soon</small>
               <strong>Something new is on its way</strong>
-              <em>Ask to be first to know <ArrowRight size={14} /></em>
-            </Link>
+              <Link href="/enquiry" className="soon-button">Ask to be first to know</Link>
+            </div>
           </div>
         </div>
       </section>

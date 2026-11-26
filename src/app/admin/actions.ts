@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { categories } from "@/data/categories";
 import { endAdminSession, isAdmin, credentialsMatch, startAdminSession } from "@/lib/adminAuth";
 import { deleteProduct, getProduct, removeUpload, saveProduct, saveUpload } from "@/lib/productStore";
+import { getSlides, saveSlides, SLIDE_COUNT } from "@/lib/marqueeStore";
 import type { CategorySlug } from "@/types/product";
 
 function getAdminReturnParams(formData: FormData) {
@@ -90,6 +91,72 @@ export async function saveProductAction(formData: FormData) {
   revalidatePath("/", "layout");
   returnParams.set("saved", "1");
   redirect(`/admin?${returnParams}`);
+}
+
+export async function saveSlideAction(formData: FormData) {
+  if (!(await isAdmin())) redirect("/admin/login");
+  const slot = Number(formData.get("slot"));
+  const back = (key: string, value: string) => redirect(`/admin?${new URLSearchParams({ [key]: value })}#strip`);
+  if (!Number.isInteger(slot) || slot < 0 || slot >= SLIDE_COUNT) back("error", "Unknown image slot.");
+
+  const slides = await getSlides();
+  const previous = slides[slot].image;
+  let image = previous;
+  let uploaded: string | undefined;
+  const upload = formData.get("imageFile");
+  const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+  if (imageUrl && !/^https?:\/\//.test(imageUrl)) back("error", "Image link must start with http:// or https://");
+  let failure: string | undefined;
+  try {
+    if (upload instanceof File && upload.size > 0) image = uploaded = await saveUpload(upload);
+    else if (imageUrl) image = imageUrl;
+    const productId = String(formData.get("productId") ?? "").trim().toLowerCase();
+    if (!image) failure = "Please upload an image or paste an image link.";
+    else if (productId && !(await getProduct(productId))) failure = `No product with code ${productId.toUpperCase()}.`;
+    else {
+      const link = String(formData.get("link") ?? "").trim();
+      const amount = (key: string) => {
+        const value = Number(String(formData.get(key) ?? "").trim() || NaN);
+        return Number.isFinite(value) && value >= 0 ? Math.round(value) : undefined;
+      };
+      slides[slot] = {
+        image,
+        title: String(formData.get("title") ?? "").trim().slice(0, 60),
+        link: link.startsWith("/") || /^https?:\/\//.test(link) ? link : "",
+        offer: String(formData.get("offer") ?? "").trim().slice(0, 30),
+        price: amount("price"),
+        oldPrice: amount("oldPrice"),
+        productId: productId || undefined,
+      };
+      await saveSlides(slides);
+    }
+  } catch (error) {
+    if (uploaded) await removeUpload(uploaded);
+    failure = error instanceof Error ? error.message : "Could not save the image.";
+  }
+  if (failure) back("error", failure);
+  if (previous && previous !== image) await removeUpload(previous);
+  revalidatePath("/", "layout");
+  back("saved", "1");
+}
+
+export async function clearSlideAction(formData: FormData) {
+  if (!(await isAdmin())) redirect("/admin/login");
+  const slot = Number(formData.get("slot"));
+  const slides = await getSlides();
+  let failure: string | undefined;
+  if (slides[slot]?.image) {
+    const old = slides[slot].image;
+    slides[slot] = { image: "", title: "", link: "" };
+    try {
+      await saveSlides(slides);
+      await removeUpload(old);
+    } catch (error) {
+      failure = error instanceof Error ? error.message : "Could not remove the image.";
+    }
+  }
+  revalidatePath("/", "layout");
+  redirect(`/admin?${new URLSearchParams(failure ? { error: failure } : { saved: "1" })}#strip`);
 }
 
 export async function deleteProductAction(formData: FormData) {

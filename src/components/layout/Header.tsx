@@ -2,16 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CircleDot, Gem, Heart, Link2, Menu, Search, ShoppingBag, Sparkles, User, X } from "lucide-react";
+import { BookHeart, CircleDot, Ear, Gem, Gift, Heart, House, Link2, Menu, Ribbon, Search, ShoppingBag, Sparkles, User, X } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { closeMobileMenu, toggleMobileMenu } from "@/redux/slices/uiSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
 type MenuType = { label: string; href: string; Icon: typeof Gem };
 type MenuList = { title: string; items: { label: string; href: string; tag?: string }[] };
-type NavLink = { href: string; label: string; heading: string; types: MenuType[]; lists: MenuList[]; feature: { kicker: string; title: string; href: string; art: string } };
+type NavLink = { href: string; label: string; NavIcon: typeof Gem; heading: string; types: MenuType[]; lists: MenuList[]; feature: { kicker: string; title: string; href: string; art: string } };
 
 // Every link below is checked against the real catalogue (search covers product
 // name + material), so none of them lands on an empty page.
@@ -21,49 +21,49 @@ const range = (base: string) => [
   { label: "Above ₹500", href: `${base}?min=500` },
 ];
 const links: NavLink[] = [
-  { href: "/shop?filter=new", label: "New in", heading: "Just landed",
+  { href: "/shop?filter=new", label: "New in", NavIcon: Sparkles, heading: "Just landed",
     types: [{ label: "New chains", href: "/shop?filter=new&cat=chains", Icon: Link2 }, { label: "New earrings", href: "/shop?filter=new&cat=earrings", Icon: Gem }, { label: "New bangles", href: "/shop?filter=new&cat=bangles", Icon: CircleDot }, { label: "New hair", href: "/shop?filter=new&cat=accessories", Icon: Sparkles }, { label: "New jewellery", href: "/shop?filter=new&cat=jewellery", Icon: Heart }],
     lists: [
       { title: "Fresh arrivals", items: [{ label: "All new products", href: "/shop?filter=new" }, { label: "New under ₹300", href: "/shop?filter=new&max=300" }, { label: "New above ₹500", href: "/shop?filter=new&min=500" }] },
       { title: "Upcoming", items: [{ label: "Coming soon", href: "/enquiry", tag: "Soon" }, { label: "Pre-order enquiry", href: "/enquiry" }, { label: "Get notified", href: "/enquiry" }] },
     ],
     feature: { kicker: "Just arrived", title: "Fresh this week", href: "/shop?filter=new", art: "✨" } },
-  { href: "/categories/jewellery", label: "Jewellery", heading: "Shop by finish",
+  { href: "/categories/jewellery", label: "Jewellery", NavIcon: Gem, heading: "Shop by finish",
     types: [{ label: "Pearl", href: "/categories/jewellery?q=pearl", Icon: CircleDot }, { label: "Rose gold", href: "/categories/jewellery?q=rose%20gold", Icon: Sparkles }, { label: "Gold tone", href: "/categories/jewellery?q=gold-tone", Icon: Gem }, { label: "Silver", href: "/categories/jewellery?q=silver", Icon: Link2 }, { label: "Enamel", href: "/categories/jewellery?q=enamel", Icon: Heart }],
     lists: [
       { title: "By style", items: [{ label: "Petal", href: "/categories/jewellery?q=petal" }, { label: "Daisy", href: "/categories/jewellery?q=daisy" }, { label: "Moon & star", href: "/categories/jewellery?q=moon" }] },
       { title: "Jewellery price", items: range("/categories/jewellery") },
     ],
     feature: { kicker: "Shop all", title: "Jewellery collection", href: "/categories/jewellery", art: "💍" } },
-  { href: "/categories/chains", label: "Chains", heading: "Chain styles",
+  { href: "/categories/chains", label: "Chains", NavIcon: Link2, heading: "Chain styles",
     types: [{ label: "Butterfly", href: "/categories/chains?q=butterfly", Icon: Sparkles }, { label: "Heart", href: "/categories/chains?q=heart", Icon: Heart }, { label: "Daisy", href: "/categories/chains?q=daisy", Icon: CircleDot }, { label: "Moon", href: "/categories/chains?q=moon", Icon: Gem }, { label: "Charm", href: "/categories/chains?q=charm", Icon: Link2 }],
     lists: [
       { title: "By finish", items: [{ label: "Pearl", href: "/categories/chains?q=pearl" }, { label: "Silver", href: "/categories/chains?q=silver" }, { label: "Gold tone", href: "/categories/chains?q=gold-tone" }] },
       { title: "Chain price", items: range("/categories/chains") },
     ],
     feature: { kicker: "Best loved", title: "All chains", href: "/categories/chains", art: "⛓️" } },
-  { href: "/categories/earrings", label: "Earrings", heading: "Earring styles",
+  { href: "/categories/earrings", label: "Earrings", NavIcon: Ear, heading: "Earring styles",
     types: [{ label: "Studs", href: "/categories/earrings?q=stud", Icon: CircleDot }, { label: "Hoops", href: "/categories/earrings?q=hoop", Icon: Link2 }, { label: "Drops", href: "/categories/earrings?q=drop", Icon: Sparkles }, { label: "Hearts", href: "/categories/earrings?q=heart", Icon: Heart }, { label: "Butterfly", href: "/categories/earrings?q=butterfly", Icon: Gem }],
     lists: [
       { title: "By finish", items: [{ label: "Pearl", href: "/categories/earrings?q=pearl" }, { label: "Rose gold", href: "/categories/earrings?q=rose%20gold" }, { label: "Silver", href: "/categories/earrings?q=silver" }] },
       { title: "Earring price", items: range("/categories/earrings") },
     ],
     feature: { kicker: "Party ready", title: "All earrings", href: "/categories/earrings", art: "💎" } },
-  { href: "/categories/accessories", label: "Hair accessories", heading: "Hair styles",
+  { href: "/categories/accessories", label: "Hair accessories", NavIcon: Ribbon, heading: "Hair styles",
     types: [{ label: "Hair clips", href: "/categories/accessories?q=clip", Icon: Sparkles }, { label: "Bows", href: "/categories/accessories?q=bow", Icon: Heart }, { label: "Hair pins", href: "/categories/accessories?q=pin", Icon: Gem }, { label: "Scrunchies", href: "/categories/accessories?q=scrunchie", Icon: CircleDot }, { label: "Sets", href: "/categories/accessories?q=set", Icon: Link2 }],
     lists: [
       { title: "By style", items: [{ label: "Heart", href: "/categories/accessories?q=heart" }, { label: "Butterfly", href: "/categories/accessories?q=butterfly" }, { label: "Daisy", href: "/categories/accessories?q=daisy" }] },
       { title: "Hair price", items: range("/categories/accessories") },
     ],
     feature: { kicker: "Cute picks", title: "All hair accessories", href: "/categories/accessories", art: "🎀" } },
-  { href: "/shop?filter=best", label: "Gifts", heading: "Gift ideas",
+  { href: "/shop?filter=best", label: "Gifts", NavIcon: Gift, heading: "Gift ideas",
     types: [{ label: "Bestsellers", href: "/shop?filter=best", Icon: Sparkles }, { label: "Hearts", href: "/shop?q=heart", Icon: Heart }, { label: "Pearl", href: "/shop?q=pearl", Icon: CircleDot }, { label: "Butterfly", href: "/shop?q=butterfly", Icon: Gem }, { label: "On sale", href: "/shop?filter=sale", Icon: Link2 }],
     lists: [
       { title: "Gift by budget", items: range("/shop") },
       { title: "Gift services", items: [{ label: "Free gift wrap", href: "/enquiry", tag: "Free" }, { label: "Custom gift box", href: "/enquiry" }, { label: "Bulk orders", href: "/enquiry" }] },
     ],
     feature: { kicker: "Free gift wrap", title: "Gifts made easy", href: "/shop?filter=best", art: "🎁" } },
-  { href: "/about", label: "Our story", heading: "About Mithu",
+  { href: "/about", label: "Our story", NavIcon: BookHeart, heading: "About Mithu",
     types: [{ label: "About us", href: "/about", Icon: Heart }, { label: "Contact", href: "/contact", Icon: Link2 }, { label: "Ask us", href: "/enquiry", Icon: Sparkles }, { label: "Wishlist", href: "/wishlist", Icon: Gem }, { label: "Bag", href: "/cart", Icon: CircleDot }],
     lists: [
       { title: "Help", items: [{ label: "Contact us", href: "/contact" }, { label: "Send an enquiry", href: "/enquiry" }, { label: "Your bag", href: "/cart" }] },
@@ -74,6 +74,12 @@ const links: NavLink[] = [
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  // Highlight the menu item for the current page (shop filter links share /shop, so they are not marked).
+  const isActive = (href: string) => {
+    const path = href.split("?")[0];
+    return path === "/" ? pathname === "/" : path !== "/shop" && (pathname === path || pathname.startsWith(`${path}/`));
+  };
   const dispatch = useAppDispatch();
   const cartCount = useAppSelector((state) =>
     state.cart.reduce((count, item) => count + item.quantity, 0),
@@ -137,14 +143,22 @@ export default function Header() {
             </Link>
           </div>
         </div>
+        {menuOpen && <div className="nav-backdrop" aria-hidden="true" onClick={() => dispatch(closeMobileMenu())} />}
         <nav className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="Main navigation">
+          <div className="nav-drawer-head">
+            <strong>Menu</strong>
+            <button type="button" className="icon-button" aria-label="Close menu" onClick={() => dispatch(closeMobileMenu())}><X size={21} /></button>
+          </div>
           <div className="shell nav-inner">
+            <div className="nav-item">
+              <Link href="/" className={`nav-top ${isActive("/") ? "is-active" : ""}`} aria-current={isActive("/") ? "page" : undefined} onClick={() => dispatch(closeMobileMenu())}><House className="nav-icon" size={15} strokeWidth={2} aria-hidden="true" /> Home</Link>
+            </div>
             {links.map((link) => {
               const close = () => dispatch(closeMobileMenu());
               return (
                 <div key={link.label} className="nav-item has-mega">
-                  <Link href={link.href} className="nav-top" onClick={close}>
-                    {link.label} <span className="nav-caret" aria-hidden="true">▾</span>
+                  <Link href={link.href} className={`nav-top ${isActive(link.href) ? "is-active" : ""}`} aria-current={isActive(link.href) ? "page" : undefined} onClick={close}>
+                    <link.NavIcon className="nav-icon" size={15} strokeWidth={2} aria-hidden="true" /> {link.label} <span className="nav-caret" aria-hidden="true">▾</span>
                   </Link>
                   <div className="mega-menu">
                     <div className="mega-grid">
