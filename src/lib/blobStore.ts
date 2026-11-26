@@ -4,10 +4,14 @@ import { get, put } from "@vercel/blob";
 
 // Where data is kept, chosen with STORAGE_MODE:
 //   "local"  -> always the local `storage` folder (even if a Blob token exists)
-//   "online" -> always Vercel Blob (needs BLOB_READ_WRITE_TOKEN)
-//   unset    -> automatic: online when BLOB_READ_WRITE_TOKEN is set, otherwise local
+//   "online" -> always Vercel Blob (needs Blob credentials, see below)
+//   unset    -> automatic: online when Blob credentials exist, otherwise local
 const mode = (process.env.STORAGE_MODE ?? "").trim().toLowerCase();
-export const blobEnabled = mode !== "local" && Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+// Blob credentials: a static BLOB_READ_WRITE_TOKEN, or (on Vercel) OIDC via BLOB_STORE_ID + VERCEL_OIDC_TOKEN.
+const hasBlobCredentials = Boolean(
+  process.env.BLOB_READ_WRITE_TOKEN || (process.env.BLOB_STORE_ID && (process.env.VERCEL || process.env.VERCEL_OIDC_TOKEN)),
+);
+export const blobEnabled = mode !== "local" && hasBlobCredentials;
 
 // A Vercel Blob store is either Public or Private. Both work: the first call tries the
 // configured kind (BLOB_ACCESS=public|private) and falls back to the other one, then remembers it.
@@ -39,7 +43,7 @@ export const FILES_ROUTE = "/api/files/";
 
 // Unguessable file name for private content (requests contain customer phone numbers).
 export const privateName = (base: string) =>
-  `${base}-${createHash("sha256").update(process.env.BLOB_READ_WRITE_TOKEN ?? "").digest("hex").slice(0, 24)}.json`;
+  `${base}-${createHash("sha256").update(process.env.OTP_SECRET || process.env.BLOB_READ_WRITE_TOKEN || "").digest("hex").slice(0, 24)}.json`;
 
 export async function readBlob(pathname: string) {
   return withAccess((access) => get(pathname, { access, useCache: false }));
